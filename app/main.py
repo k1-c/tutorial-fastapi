@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from pydantic import BaseModel
 
 
@@ -12,28 +12,13 @@ class Item(BaseModel):
 app = FastAPI()
 
 
-@app.post("/items/")
-async def create_item(item: Item):
+@app.get("/items/")
+async def read_items(q: str = Query(None, min_length=3, max_length=50)):
     """
-    Request Bodyを使いたい場合、Pydanticを利用する。
-    Pydanticに定義された型・Bodyが要求される。
-    If its not required, declare default value.
+    Queryを使ってデフォルト値とカスタムバリデーションを加える
+    ex. ３文字以上５０文字以下
     """
-    return item
-
-
-# @app.put("/items/{item_id}")
-# async def create_item(item_id: int, item: Item):
-    # Putを利用する場合
-    # return {"item_id": item_id, **item.dict()}
-
-
-@app.put("/items/{item_id}")
-async def create_item(item_id: int, item: Item, q: str = None):
-    """
-    クエリパラメータとPutを利用する
-    """
-    result = {"item_id": item_id, **item.dict()}
+    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
     if q:
-        result.update({"q": q})
-    return result
+        results.update({"q": q})
+    return results
