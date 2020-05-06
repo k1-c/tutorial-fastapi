@@ -1,25 +1,27 @@
-from fastapi import FastAPI, Path, Query
+from fastapi import FastAPI, Path
+from pydantic import BaseModel
 
 
 app = FastAPI()
 
 
-@app.get("/items/{item_id}")
-async def read_items(
+class Item(BaseModel):
+    name: str
+    description: str = None
+    price: float
+    tax: float = None
+
+
+@app.put("/items/{item_id}")
+async def update_item(
     *,
     item_id: int = Path(..., title="The ID of the item to get", ge=0, le=1000),
-    q: str,
-    size: float = Query(..., gt=0, lt=10.5)
+    q: str = None,
+    item: Item = None,
 ):
-    """
-    Queryと同じ全てのメタデータを宣言できる。
-    Validations:
-    gt: greater than
-    ge: greater than or equal
-    lt: less than
-    le: less than or equal
-    """
     results = {"item_id": item_id}
     if q:
         results.update({"q": q})
+    if item:
+        results.update({"item": item})
     return results
