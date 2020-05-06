@@ -1,24 +1,25 @@
-from fastapi import FastAPI, Query
-from pydantic import BaseModel
-
-
-class Item(BaseModel):
-    name: str
-    description: str = None
-    price: float
-    tax: float = None
+from fastapi import FastAPI, Path, Query
 
 
 app = FastAPI()
 
 
-@app.get("/items/")
-async def read_items(q: str = Query(None, min_length=3, max_length=50, regex="^fixedquery$")):
+@app.get("/items/{item_id}")
+async def read_items(
+    *,
+    item_id: int = Path(..., title="The ID of the item to get", ge=0, le=1000),
+    q: str,
+    size: float = Query(..., gt=0, lt=10.5)
+):
     """
-    Queryを使ってデフォルト値とカスタムバリデーションを加える
-    ex. ３文字以上５０文字以下
+    Queryと同じ全てのメタデータを宣言できる。
+    Validations:
+    gt: greater than
+    ge: greater than or equal
+    lt: less than
+    le: less than or equal
     """
-    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
+    results = {"item_id": item_id}
     if q:
         results.update({"q": q})
     return results
