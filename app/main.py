@@ -13,7 +13,7 @@ app = FastAPI()
 
 
 @app.get("/items/")
-async def read_items(q: str = Query(None, min_length=3, max_length=50)):
+async def read_items(q: str = Query(None, min_length=3, max_length=50, regex="^fixedquery$")):
     """
     Queryを使ってデフォルト値とカスタムバリデーションを加える
     ex. ３文字以上５０文字以下
